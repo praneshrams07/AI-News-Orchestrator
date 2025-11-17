@@ -1,0 +1,14 @@
+requests
+streamlit
+python-dateutil
+dateparser
+spacy
+sentence-transformers
+openai
+plotly
+pandas
+tqdm
+langdetect
+beautifulsoup4
+mysql-connector-python
+python-dotenv

@@ -1,0 +1,5 @@
+venv/
+.env
+news_cache.db
+__pycache__/
+*.pyc
