@@ -2,19 +2,22 @@ requests
 streamlit
 python-dateutil
 dateparser
-spacy
-sentence-transformers
-openai
-plotly
+feedparser
+beautifulsoup4
 pandas
 tqdm
 langdetect
-beautifulsoup4
 mysql-connector-python
 python-dotenv
+plotly
+openai
+sentence-transformers
 google-generativeai
-feedparser
-python-dateutil
+
+# spaCy (must be AFTER all general deps)
 spacy==3.7.2
-https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1-py3-none-any.whl
 spacy-lookups-data
+
+# spaCy English model (MUST be last)
+https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1-py3-none-any.whl
+
