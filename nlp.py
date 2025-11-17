@@ -1,5 +1,4 @@
 # nlp.py
-import spacy
 from dateparser import parse as parse_date
 
 import en_core_web_sm
