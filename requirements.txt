@@ -12,3 +12,6 @@ langdetect
 beautifulsoup4
 mysql-connector-python
 python-dotenv
+google-generativeai
+feedparser
+python-dateutil
