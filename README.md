@@ -1,4 +1,5 @@
 # 📰 AI News Orchestrator (Google News + GDELT + Wikipedia + Gemini)
+# Stereamlit link: https://ai-news-orchestrator-xzdtr696dydbwzuwxmdqff.streamlit.app/
 
 An end-to-end AI-powered news reconstruction system that fetches articles from multiple sources, builds a chronological timeline, generates a detailed summary, evaluates article credibility, and checks for cross-source factual consistency — all inside a clean Streamlit interface.
 
