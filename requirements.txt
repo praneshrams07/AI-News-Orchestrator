@@ -11,8 +11,6 @@ python-dotenv
 plotly
 sentence-transformers
 google-generativeai
-
-# HuggingFace Transformers + PyTorch (needed for your NER pipeline)
 transformers
 torch
 
