@@ -2,6 +2,8 @@
 # app.py — AI News Orchestrator (No Cache)
 # --------------------------------------
 import streamlit as st
+st.set_page_config(page_title="AI News Orchestrator", layout="wide")   # MUST COME FIRST
+
 import json, re
 
 from fetch_news import fetch_from_newsapi
@@ -18,7 +20,6 @@ from llm_service import (
     batch_check_discrepancies
 )
 
-
 # --------------------------------------
 # NO-CACHE MODE (overwrite load/save)
 # --------------------------------------
@@ -26,7 +27,7 @@ def load_articles(query):
     return None   # ALWAYS fetch fresh
 
 def save_articles(query, articles):
-    pass  # Do nothing (disabled cache)
+    pass  # No-op
 
 
 # --------------------------------------
@@ -44,12 +45,9 @@ def render_summary_card(query, articles):
     st.title("📰 AI News Orchestrator — Summary Card")
     st.write(f"### Topic: **{query}**")
 
-    # Use max 20 articles for LLM stability
     articles_llm = articles[:20]
 
-    # ---------------------------
-    # 1️⃣ TIMELINE + SUMMARY (Batch)
-    # ---------------------------
+    # 1️⃣ TIMELINE + SUMMARY
     st.info("⏳ Building timeline + summary...")
     try:
         result = batch_timeline_and_summary(articles_llm, query=query)
@@ -59,9 +57,7 @@ def render_summary_card(query, articles):
         st.error(f"Timeline/summary generation failed: {e}")
         timeline, summary = [], "Summary unavailable."
 
-    # ---------------------------
-    # 2️⃣ AUTHENTICITY (Batch)
-    # ---------------------------
+    # 2️⃣ AUTHENTICITY
     st.info("⏳ Evaluating credibility...")
     try:
         auth_results = batch_evaluate_link_authenticity(articles_llm)
@@ -70,19 +66,13 @@ def render_summary_card(query, articles):
         auth_results = []
 
     auth_map = {r.get("url",""): r for r in auth_results}
-
-    per_link_scores = []
-    for a in articles_llm:
-        r = auth_map.get(a.get("url",""), {})
-        score = float(r.get("credibility_score", 0.6))
-        per_link_scores.append(score)
-
+    per_link_scores = [
+        float(auth_map.get(a.get("url",""), {}).get("credibility_score", 0.6))
+        for a in articles_llm
+    ]
     overall_score = sum(per_link_scores)/len(per_link_scores) if per_link_scores else 0.6
 
-
-    # ---------------------------
-    # 3️⃣ TIMELINE RENDERING
-    # ---------------------------
+    # 3️⃣ TIMELINE
     st.markdown("## 🧠 Timeline and Summary")
     st.markdown("### 📅 Chronological Timeline")
 
@@ -97,10 +87,7 @@ def render_summary_card(query, articles):
             st.markdown(f"- {ev}")
         st.write("")
 
-
-    # ---------------------------
-    # 4️⃣ SUMMARY BOX
-    # ---------------------------
+    # 4️⃣ SUMMARY
     st.markdown("### 📝 Detailed Summary")
     st.markdown(
         f"""
@@ -117,10 +104,7 @@ def render_summary_card(query, articles):
         unsafe_allow_html=True
     )
 
-
-    # ---------------------------
-    # 5️⃣ DISCREPANCY CHECK (Batch)
-    # ---------------------------
+    # 5️⃣ DISCREPANCY CHECK
     st.markdown("---")
     st.markdown("## ⚠️ Fact Consistency Checker")
 
@@ -135,7 +119,6 @@ def render_summary_card(query, articles):
         title = item.get("event","")[:60]
         with st.expander(f"Check: {title}..."):
             st.write("### Consistent?", item.get("is_consistent"))
-            
             if item.get("agreement_points"):
                 st.success("Agreement Across Sources:")
                 for p in item["agreement_points"]:
@@ -148,10 +131,7 @@ def render_summary_card(query, articles):
 
             st.write("**Severity:**", item.get("severity","N/A"))
 
-
-    # ---------------------------
-    # 6️⃣ SOURCES LIST
-    # ---------------------------
+    # 6️⃣ SOURCES
     st.markdown("---")
     st.markdown("## 🔗 Sources Used")
 
@@ -169,10 +149,7 @@ def render_summary_card(query, articles):
             unsafe_allow_html=True
         )
 
-
-    # ---------------------------
-    # 7️⃣ OVERALL SCORE
-    # ---------------------------
+    # 7️⃣ FINAL SCORE
     st.markdown("---")
     st.markdown("## 🔍 Overall Authenticity Score")
     st.metric("Event Authenticity", f"{overall_score:.2f}")
@@ -186,22 +163,18 @@ def render_summary_card(query, articles):
 
 
 # --------------------------------------
-# MAIN APP UI
+# MAIN UI
 # --------------------------------------
-st.set_page_config(page_title="AI News Orchestrator", layout="wide")
+
 st.title("📰 AI News Orchestrator")
 st.write("Generate timeline + summary + authenticity + fact-check consistency.")
 
-
 query = st.text_input("Enter an event or topic:", "Chandrayaan-3")
-
 
 if st.button("Generate Summary Card"):
 
-    # No cache: always fetch fresh
-    articles = None
-
     year = extract_year(query)
+    articles = None
 
     if year and year <= 2021:
         st.info("Using Wikipedia for historical events...")
@@ -223,21 +196,19 @@ if st.button("Generate Summary Card"):
             articles = fetch_from_newsapi(query, page_size=10)
 
     if not articles:
-        st.error("No articles found from any source.")
+        st.error("No articles found.")
         st.stop()
 
-
-    # CLEAN + NORMALIZE
+    # Clean + normalize
     for a in articles:
         a["content"] = clean_html(a.get("content","") or "")
         a["entities"] = annotate_event_text(a["content"])
         if len(a.get("publishedAt","")) == 14:
             a["publishedAt"] = parse_gdelt_date(a["publishedAt"])
 
-    # SMART FILTER
     articles = smart_filter_articles(query, articles)
 
-    # RENDER
+    # Render final
     render_summary_card(query, articles)
 
 

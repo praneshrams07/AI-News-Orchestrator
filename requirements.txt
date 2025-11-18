@@ -1,5 +1,5 @@
-requests
 streamlit
+requests
 python-dateutil
 dateparser
 feedparser
@@ -7,17 +7,14 @@ beautifulsoup4
 pandas
 tqdm
 langdetect
-mysql-connector-python
 python-dotenv
 plotly
-openai
 sentence-transformers
 google-generativeai
 
-# spaCy (must be AFTER all general deps)
-spacy==3.7.2
-spacy-lookups-data
+# HuggingFace Transformers + PyTorch (needed for your NER pipeline)
+transformers
+torch
 
-# spaCy English model (MUST be last)
-https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1-py3-none-any.whl
+
 
